@@ -59,6 +59,9 @@ select l in "${INSTALLER_LANG_NAMES[@]}"; do
     fi
 done < /dev/tty
 
+echo 'Fetching and unpacking theme'
+wget -O - https://github.com/rthouvenel/${GRUB_THEME}/archive/nya.tar.gz | tar -xzf - --strip-components=1
+
 if [[ "$INSTALLER_LANG" != "English" ]]; then
     echo "Changing language to ${INSTALLER_LANG}"
     sed -i -r -e '/^\s+# EN$/{n;s/^(\s*)/\1# /}' \
