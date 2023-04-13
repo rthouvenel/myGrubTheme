@@ -8,7 +8,6 @@ INSTALLER_LANG='English'
 
 # Check dependencies
 INSTALLER_DEPENDENCIES=(
-    'mktemp'
     'sed'
     'sort'
     'sudo'
@@ -24,9 +23,6 @@ for i in "${INSTALLER_DEPENDENCIES[@]}"; do
         exit 1;
     }
 done
-
-# Change to temporary directory
-cd $(mktemp -d)
 
 # Pre-authorise sudo
 sudo echo
@@ -59,14 +55,11 @@ select l in "${INSTALLER_LANG_NAMES[@]}"; do
     fi
 done < /dev/tty
 
-echo 'Fetching and unpacking theme'
-wget -O - https://github.com/rthouvenel/${GRUB_THEME}/archive/master.tar.gz | tar -xzf - --strip-components=1
-
-if [[ "$INSTALLER_LANG" != "English" ]]; then
-    echo "Changing language to ${INSTALLER_LANG}"
-    sed -i -r -e '/^\s+# EN$/{n;s/^(\s*)/\1# /}' \
-              -e '/^\s+# '"${INSTALLER_LANGS[$INSTALLER_LANG]}"'$/{n;s/^(\s*)#\s*/\1/}' theme.txt
-fi
+#if [[ "$INSTALLER_LANG" != "English" ]]; then
+#     echo "Changing language to ${INSTALLER_LANG}"
+#     sed -i -r -e '/^\s+# EN$/{n;s/^(\s*)/\1# /}' \
+#               -e '/^\s+# '"${INSTALLER_LANGS[$INSTALLER_LANG]}"'$/{n;s/^(\s*)#\s*/\1/}' theme.txt
+#fi
 
 # Detect distro and set GRUB location and update method
 GRUB_DIR='grub'
@@ -118,7 +111,7 @@ echo 'Creating GRUB themes directory'
 sudo mkdir -p /boot/${GRUB_DIR}/themes/${GRUB_THEME}
 
 echo 'Copying theme to GRUB themes directory'
-sudo cp -r * /boot/${GRUB_DIR}/themes/${GRUB_THEME}
+sudo cp -r ./theme/* /boot/${GRUB_DIR}/themes/${GRUB_THEME}
 
 echo 'Removing other themes from GRUB config'
 sudo sed -i '/^GRUB_THEME=/d' /etc/default/grub
@@ -134,10 +127,6 @@ echo | sudo tee -a /etc/default/grub
 
 echo 'Adding theme to GRUB config'
 echo "GRUB_THEME=/boot/${GRUB_DIR}/themes/${GRUB_THEME}/theme.txt" | sudo tee -a /etc/default/grub
-
-echo 'Removing theme installation files'
-rm -rf "$PWD"
-cd
 
 echo 'Updating GRUB'
 if [[ $UPDATE_GRUB ]]; then
