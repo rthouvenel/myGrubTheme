@@ -30,6 +30,23 @@ cd $(mktemp -d)
 # Pre-authorise sudo
 sudo echo
 
+declare -A INSTALLER_GRUB_THEMES=(
+    [OverWatch]='ovWatch'
+    [HellTaker]='myGrubTheme'
+)
+
+INSTALLER_GRUB_NAMES=($(echo ${!INSTALLER_GRUB_THEMES[*]} | tr ' ' '\n' | sort -n))
+
+PS3='Please select a grub theme #: '
+select l in "${INSTALLER_GRUB_NAMES[@]}"; do
+    if [[ -v INSTALLER_GRUB_THEMES[$l] ]]; then
+        GRUB_THEME=${INSTALLER_GRUB_THEMES[$l]}
+        break
+    else
+        echo 'No such grub theme, try again'
+    fi
+done < /dev/tty
+
 # Select language, optional
 declare -A INSTALLER_LANGS=(
     [Chinese]=zh_CN
