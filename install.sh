@@ -61,7 +61,7 @@ done < /dev/tty
 echo "Fetching and unpacking theme"
 wget https://github.com/rthouvenel/${GRUB_THEME}/archive/refs/heads/main.zip
 unzip main.zip
-cd ${GRUB_THEME}
+cd ${GRUB_THEME}-main
 
 #if [[ "$INSTALLER_LANG" != "English" ]]; then
 #     echo "Changing language to ${INSTALLER_LANG}"
