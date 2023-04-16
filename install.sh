@@ -8,6 +8,7 @@ INSTALLER_LANG='English'
 
 # Check dependencies
 INSTALLER_DEPENDENCIES=(
+    'mktemp'
     'sed'
     'sort'
     'sudo'
@@ -23,6 +24,8 @@ for i in "${INSTALLER_DEPENDENCIES[@]}"; do
         exit 1;
     }
 done
+
+cd $(mktemp -d)
 
 # Pre-authorise sudo
 sudo echo
@@ -54,6 +57,11 @@ select l in "${INSTALLER_LANG_NAMES[@]}"; do
         echo 'No such language, try again'
     fi
 done < /dev/tty
+
+echo "Fetching and unpacking theme"
+wget https://github.com/rthouvenel/${GRUB_THEME}/archive/refs/heads/main.zip
+unzip main.zip
+cd ${GRUB_THEME}
 
 #if [[ "$INSTALLER_LANG" != "English" ]]; then
 #     echo "Changing language to ${INSTALLER_LANG}"
@@ -127,6 +135,11 @@ echo | sudo tee -a /etc/default/grub
 
 echo 'Adding theme to GRUB config'
 echo "GRUB_THEME=/boot/${GRUB_DIR}/themes/${GRUB_THEME}/theme.txt" | sudo tee -a /etc/default/grub
+
+echo 'Removing theme installation files'
+cd ..
+rm -rf "$PWD"
+cd
 
 echo 'Updating GRUB'
 if [[ $UPDATE_GRUB ]]; then
